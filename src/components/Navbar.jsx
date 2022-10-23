@@ -15,10 +15,10 @@ const Navbar = () => {
                     <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div className="navbar-nav">
                         <a className="nav-link active" aria-current="page" href="/">Home</a>
-                        <a className="btn btn-outline-dark" href="/login"><i className="fa fa-sign-in me-1"></i>Login</a> 
                         <NavLink className="btn btn-outline-dark" href="/kart"><i className="fa fa-shopping-cart me-1">
                             </i>Cart ({state.length})
                         </NavLink> 
+                        <a className="btn btn-outline-dark" href="/login"><i className="fa fa-sign-in me-1"></i>Login</a> 
                         {/* <a className="nav-link disabled">Disabled</a> */}
                     </div>
                     </div>
