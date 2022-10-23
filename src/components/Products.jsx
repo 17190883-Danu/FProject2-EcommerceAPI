@@ -1,6 +1,9 @@
 import React, {useState, useEffect} from "react";
 import Skeleton from "react-loading-skeleton";
 import { NavLink } from "react-router-dom";
+// import { addCart } from "../redux/action";
+// import { useDispatch } from "react-redux";
+// import { useParams } from 'react-router';
 
 const Products = () => {
 
@@ -77,8 +80,11 @@ const Products = () => {
                             ${product.price}
                         </p>
                         <NavLink to={`/${product.id}`} className="btn btn-primary">
-                            Buy
+                            Detail
                         </NavLink>
+                        <button className='btn btn-primary'>
+                            Add to Cart
+                         </button>
                     </div>
                     </div>
                     </div>
