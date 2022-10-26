@@ -13,3 +13,11 @@ export const delCart = (prodet) => {
         payload : prodet
     }
 }
+
+// Login
+export const TokenUser = (token) => {
+    return{
+        type : "TOKEN",
+        payload : token
+    }
+}
