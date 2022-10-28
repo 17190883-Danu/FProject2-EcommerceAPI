@@ -15,9 +15,9 @@ export const delCart = (prodet) => {
 }
 
 // Login
-export const TokenUser = (token) => {
+export const Login = (Login) => {
     return{
-        type : "TOKEN",
-        payload : token
+        type : "LOGIN",
+        payload : Login
     }
 }

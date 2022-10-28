@@ -8,7 +8,7 @@ import LoginForm from './components/LoginForm';
 
 function App() {
   const path = useLocation();
-  console.log(path)
+  // console.log(path)
   return (
     <div className="App">
           {path.pathname.toLowerCase() !== "/login" && <Navbar />}

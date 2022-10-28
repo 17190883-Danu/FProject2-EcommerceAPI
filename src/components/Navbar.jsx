@@ -3,7 +3,7 @@ import { useSelector } from "react-redux";
 import { NavLink } from "react-router-dom";
 
 const Navbar = () => {
-    const state = useSelector((state) => state.handleCart)
+    // const state = useSelector((state) => state.handleCart)
     return (
         <div>
             <nav className="navbar navbar-expand-lg bg-light">
@@ -15,8 +15,8 @@ const Navbar = () => {
                     <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                     <div className="navbar-nav">
                         <a className="nav-link active" aria-current="page" href="/">Home</a>
-                        <NavLink className="btn btn-outline-dark" href="/kart"><i className="fa fa-shopping-cart me-1">
-                            </i>Cart ({state.length})
+                        <NavLink className="btn btn-outline-dark" href="/kart">
+                            <i className="fa fa-shopping-cart me-1" />Cart
                         </NavLink> 
                         <a className="btn btn-outline-dark" href="/login"><i className="fa fa-sign-in me-1"></i>Login</a> 
                         {/* <a className="nav-link disabled">Disabled</a> */}
