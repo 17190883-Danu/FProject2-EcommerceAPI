@@ -1,5 +1,5 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { authLoginAPI } from "../redux/reducer/handleAuth";
@@ -14,11 +14,18 @@ function LoginForm() {
   const [password, setPassword] = useState("");
   const dispatch = useDispatch();
   const loginState = useSelector((state) => state.auth)
+  const navigate = useNavigate()
 
   const submitHandler = (e) => {
     e.preventDefault();
     const login = {email, password}
     dispatch(authLoginAPI({email, password}))
+    .unwrap()
+    .then(() => {
+      // handleRedirectToHome()
+      navigate('/')
+      window.location.reload()
+    })
   };
 
   const emailChange = (event) => {
@@ -66,12 +73,13 @@ function LoginForm() {
             <input
               type="submit"
               className={`btn btn-primary py-2 px-4
-                ${loginState.isLoginPending || loginState.isLoginSuccess ? " Disabled" : ''}
+                ${loginState.isLoginPending ? " Disabled" : ''}
               `}
               value={`${loginState.isLoginPending ? "Logging In" : (loginState.isLoginSuccess ? "Logged In" : "Login")}`}
-              disabled={loginState.isLoginPending || loginState.isLoginSuccess}
+              disabled={loginState.isLoginPending}
               />
           </div>
+              {loginState.errorMessage && <div className="text-danger">{loginState.errorMessage}</div>}
         </form>
         <object data={landingImage} alt="landingImage" className="w-auto h-100 rounded-3"  style={{objectFit: 'cover', backgroundRepeat: 'no-repeat', imageRendering: 'smooth'}}></object>
       </div>

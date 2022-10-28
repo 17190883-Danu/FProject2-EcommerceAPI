@@ -13,9 +13,9 @@ function App() {
     <div className="App">
           {path.pathname.toLowerCase() !== "/login" && <Navbar />}
             <Routes>
-                  <Route element={<LoginForm/>} path="/login"></Route>
-                  <Route element={<Products/>} path="/"></Route>
-                  <Route element={<ProductDetail/>} path="/:id"></Route>
+                  <Route element={<LoginForm/>} path="/login" />
+                  <Route element={<Products/>} exact path="/" />
+                  <Route element={<ProductDetail/>} path="/:id" />
           </Routes>  
     </div>
   );

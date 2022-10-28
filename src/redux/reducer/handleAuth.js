@@ -37,6 +37,14 @@ export const authLoginAPI = createAsyncThunk('auth/login', async ({email, passwo
     }
 })
 
+export const logout = createAsyncThunk('auth/logout', async () => {
+    try {
+        localStorage.removeItem('login')
+    } catch(err) {
+        throw(err)
+    }
+})
+
 const handleAuth = createSlice({
     name: 'auth',
     initialState,
@@ -72,6 +80,11 @@ const handleAuth = createSlice({
             state.isLoginPending = false
             state.isLoginSuccess = false
             state.errorMessage = action.error.message
+        })
+        .addCase(logout.fulfilled, (state, action) => {
+            state.isLoginPending = false;
+            state.isLoginSuccess = false;
+            state.errorMessage = '';
         })
     }
 })

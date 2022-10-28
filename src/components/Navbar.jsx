@@ -1,27 +1,59 @@
 import React from "react";
-import { useSelector } from "react-redux";
-import { NavLink } from "react-router-dom";
+import { useDispatch, useSelector } from "react-redux";
+import { NavLink, useNavigate } from "react-router-dom";
+import {
+    FiLogIn,
+    FiLogOut,
+    FiShoppingCart,
+    FiHome
+} from "react-icons/fi";
+import { logout } from "../redux/reducer/handleAuth";
+
 
 const Navbar = () => {
+    const dispatch = useDispatch();
+    const loginInfo = JSON.parse(localStorage.getItem("login"));
+    const navigate = useNavigate();
+    console.log('loginInfo ', loginInfo)
+
+    const handleLogout = () => {
+        dispatch(logout())
+        .unwrap()
+        .then(() => {
+            window.location.reload()
+        })
+    }
     // const state = useSelector((state) => state.handleCart)
     return (
         <div>
             <nav className="navbar navbar-expand-lg bg-light">
-                <div className="container-fluid">
+                <div className="container-fluid d-flex justify-content-between">
                     <a className="navbar-brand" >G-SHOP</a>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
                     </button>
                     <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
-                    <div className="navbar-nav">
-                        <a className="nav-link active" aria-current="page" href="/">Home</a>
-                        <NavLink className="btn btn-outline-dark" href="/kart">
-                            <i className="fa fa-shopping-cart me-1" />Cart
-                        </NavLink> 
-                        <a className="btn btn-outline-dark" href="/login"><i className="fa fa-sign-in me-1"></i>Login</a> 
-                        {/* <a className="nav-link disabled">Disabled</a> */}
+                        <div className="navbar-nav container d-flex justify-content-center align-items-center gap-5">
+                            <NavLink className="text-reset text-decoration-none d-flex align-items-center" to="/">
+                                <FiHome />&nbsp;Home
+                            </NavLink> 
+                            <NavLink className="text-reset text-decoration-none d-flex align-items-center" to="/cart">
+                                <FiShoppingCart/>&nbsp;Cart
+                            </NavLink> 
+                        </div>
                     </div>
-                    </div>
+                    { loginInfo != null ? 
+                    (
+                        <button component={NavLink} className="btn btn-outline-dark" tabindex="-1" role="button" aria-disabled="true" onClick={handleLogout}>
+                            <FiLogOut />
+                            &nbsp;Logout
+                        </button>
+                    ) :
+                    (
+                        <button component={NavLink} className="btn btn-dark" role="button" aria-disabled="true" onClick={() => navigate('/login')}>
+                            <FiLogIn />
+                            &nbsp;Login
+                        </button>
+                    )}
                 </div>
             </nav>
         </div>
