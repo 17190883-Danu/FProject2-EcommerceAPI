@@ -27,7 +27,7 @@ const Navbar = () => {
     return (
         <div>
             <nav className="navbar navbar-expand-lg bg-light">
-                <div className="container-fluid d-flex justify-content-between">
+                <div className="container d-flex justify-content-between">
                     <a className="navbar-brand" >G-SHOP</a>
                     <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
                     </button>
