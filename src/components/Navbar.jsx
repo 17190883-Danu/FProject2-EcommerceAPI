@@ -36,7 +36,7 @@ const Navbar = () => {
                             <NavLink className="text-reset text-decoration-none d-flex align-items-center" to="/">
                                 <FiHome />&nbsp;Home
                             </NavLink> 
-                            <NavLink className="text-reset text-decoration-none d-flex align-items-center" to="/cart">
+                            <NavLink className="text-reset text-decoration-none d-flex align-items-center" to={loginInfo === null ? "/login" : "/cart"}>
                                 <FiShoppingCart/>&nbsp;Cart
                             </NavLink> 
                         </div>

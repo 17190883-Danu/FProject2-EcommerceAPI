@@ -8,7 +8,8 @@ const initialState = {
     isRejected: false,
     errorMessage: '',
     products: [],
-    cart: []
+    cart: [],
+    newQty: 0
 }
 
 const PRODUCTS_URL = 'https://fakestoreapi.com/products';
@@ -27,7 +28,7 @@ function getProductAPI() {
                     return {...x, stock: 20}
                 })
                 // const addStock = {...res.data, stock: 20}
-                console.log('stock ',addStock)
+                // console.log('stock ',addStock)
                 localStorage.setItem("products", JSON.stringify(addStock))
                 resolve(addStock)
             })
@@ -52,6 +53,39 @@ function reduceStock(id) {
     return data
 }
 
+function changeQty(itemId, qtyState) {
+        const response = JSON.parse(localStorage.getItem("cart"))
+        const data = response.map((x) => {
+            console.log(itemId) 
+            if(x.cart_id == itemId) {
+                const newQty = x.qty + (qtyState)
+                return {...x, qty: newQty}
+            } else {
+                return x 
+            }
+        })
+        const loginInfo = JSON.parse(localStorage.getItem("login"))
+        const userId = loginInfo[0].id_user
+        console.log('userId ', userId)
+        const filteredData = data.filter((x) => x.id_user === userId)
+        console.log('filteredData ', filteredData)
+        localStorage.setItem("cart", JSON.stringify(filteredData))
+        return filteredData
+}
+
+function restoreStock(id, returnedStock) {
+    const response = JSON.parse(localStorage.getItem("products"))
+    const data = response.map((x) => {
+        if(x.id === id) {
+            return {...x, stock: x.stock + returnedStock}
+        } else {
+            return x
+        }
+    })
+    localStorage.setItem("products", JSON.stringify(data))
+    return data
+}
+
 export const fetchProducts = createAsyncThunk('products/fetchProducts', async () => {
     try {
         const response = await getProductAPI()
@@ -61,10 +95,82 @@ export const fetchProducts = createAsyncThunk('products/fetchProducts', async ()
     }
 })
 
+export const fetchOneProduct = createAsyncThunk('products/fetchOneProduct', async (id) => {
+    try {
+        const response = await getProductAPI()
+        // debugger
+        const data = response.filter((x) => x.id === parseInt(id))
+        // console.log('data ', data)
+        return data
+    } catch(err) {
+        throw(err)
+    }
+})
+
+export const showCart = createAsyncThunk('cart/showCart', async () => {
+    try {
+        const response = await JSON.parse(localStorage.getItem("cart"))
+        const loggedUser = JSON.parse(localStorage.getItem("login"))
+        const userId = loggedUser[0].id_user
+        const filteredCart = response.filter((x) => x.id_user === userId)
+        // console.log('response', response)
+        return filteredCart
+    } catch(err) {
+        throw('error showing cart: ', err)
+    }
+})
+
 export const addToCart = createAsyncThunk('products/addToCart', async (id) => {
     try {
         const response = await getProductAPI()
         const data = response.filter((x) => x.id === id)
+        delete data[0]["stock"]
+        return data
+    } catch(err) {
+        throw(err)
+    }
+}) 
+
+export const deleteFromCart = createAsyncThunk('cart/deleteFromCart', async (id) => {
+    try {
+        const response = await JSON.parse(localStorage.getItem("cart"))
+        const returnItem = response.filter((x) => {
+            if(x.cart_id === id) {
+                return [x.id, x.qty]
+            }
+        })
+        restoreStock(returnItem[0][0], returnItem[0][1])
+        const data = response.filter((x) => x.cart_id !== id)
+        localStorage.setItem("cart", JSON.stringify(data))
+        console.log('data cart ', data)
+        return data
+    } catch(err) {
+        throw(err)
+    }
+})
+
+export const checkout = createAsyncThunk('cart/checkout', async () => {
+    try {
+        const response = await JSON.parse(localStorage.getItem("cart"))
+        const products = await JSON.parse(localStorage.getItem("products"))
+        const loggedUser = JSON.parse(localStorage.getItem("login"))
+        const userId = loggedUser[0].id_user
+        const filteredCart = response.filter((x) => x.id_user === userId)
+        // const data = filteredCart.map((x) => {
+        //     return {...x, status: 'paid'}
+        // })
+        const data = products.map((x) => {
+            const filtered = filteredCart.filter((y) => y.id === x.id)
+            if(filtered.length > 0) {
+                return {...x, stock: x.stock - filtered[0].qty}
+            } else {
+                return x
+            }
+        })
+        const emptyCart = response.filter((x) => x.id_user !== userId)
+        localStorage.setItem("cart", JSON.stringify(emptyCart))
+        localStorage.setItem("products", JSON.stringify(data))
+        // console.log('filteredCart ', filteredCart)
         return data
     } catch(err) {
         throw(err)
@@ -74,7 +180,17 @@ export const addToCart = createAsyncThunk('products/addToCart', async (id) => {
 const handleCart = createSlice({
     name: 'products',
     initialState,
-    reducers: {},
+    reducers: {
+        increment: (state, action) => {
+            console.log('itemId ', action.payload)
+            const {id} = action.payload
+            state.cart = changeQty(id, 1)
+        },
+        decrement: (state, action) => {
+            const {id} = action.payload
+            state.cart = changeQty(id, -1)
+        }
+    },
     extraReducers(builder) {
         builder.addCase(fetchProducts.pending, (state, action) => {
             state.isPending = true;
@@ -93,6 +209,43 @@ const handleCart = createSlice({
             state.isRejected = true;
             state.errorMessage = action.error.message;
         })
+
+        .addCase(fetchOneProduct.pending, (state, action) => {
+            state.isPending = true;
+            state.isLoaded = false;
+            state.isRejected = false;
+        })
+        .addCase(fetchOneProduct.fulfilled, (state, action) => {
+            state.isPending = false;
+            state.isLoaded = true;
+            state.isRejected = false;
+            state.products = action.payload;
+        })
+        .addCase(fetchOneProduct.rejected, (state, action) => {
+            state.isPending = false;
+            state.isLoaded = false;
+            state.isRejected = true;
+            state.errorMessage = action.error.message;
+        })
+
+        .addCase(showCart.pending, (state, action) => {
+            state.isPending = true;
+            state.isLoaded = false;
+            state.isRejected = false;
+        })
+        .addCase(showCart.fulfilled, (state, action) => {
+            state.cart = action.payload;
+            state.isPending = false;
+            state.isLoaded = true;
+            state.isRejected = false;
+        })
+        .addCase(showCart.rejected, (state, action) => {
+            state.isPending = false;
+            state.isLoaded = false;
+            state.isRejected = true;
+            state.errorMessage = action.error.message;
+        })
+
         .addCase(addToCart.pending, (state, action) => {
             state.isPending = true;
             state.isLoaded = false;
@@ -102,19 +255,61 @@ const handleCart = createSlice({
             state.isPending = false;
             state.isLoaded = true;
             state.isRejected = false;
+            const loggedUser = JSON.parse(localStorage.getItem("login"))
+            const cart = (JSON.parse(localStorage.getItem("cart")) ? JSON.parse(localStorage.getItem("cart")) : [])
+            const userId = loggedUser[0].id_user
             const data = action.payload[0]
-            const index = state.cart.findIndex((x) => x.id === data.id)
+            const index = cart.findIndex((x) => x.id === data.id && x.id_user === userId)
+            const cartId = uuidv4()
             if(index === -1) {
-                const newData = {...data, qty: 1, total: data.price}
-                state.cart = [...state.cart, newData]
+                const newData = {cart_id: cartId, id_user: userId, ...data, qty: 1, total: data.price}
+                state.cart = [...cart, newData]
             } else {
-                const newData = {...data, qty: state.cart[index].qty + 1, total: state.cart[index].total + data.price}
+                const newData = {cart_id: cartId, id_user: userId, ...data, qty: state.cart[index].qty + 1, total: state.cart[index].total + data.price}
                 state.cart[index] = newData
             }
             reduceStock(data.id)
             localStorage.setItem("cart", JSON.stringify(state.cart))
         })
         .addCase(addToCart.rejected, (state, action) => {
+            state.isPending = false;
+            state.isLoaded = false;
+            state.isRejected = true;
+            state.errorMessage = action.error.message;
+        })
+
+        .addCase(deleteFromCart.pending, (state, action) => {
+            state.isPending = true;
+            state.isLoaded = false;
+            state.isRejected = false;
+        })
+        .addCase(deleteFromCart.fulfilled, (state, action) => {
+            state.isPending = false;
+            state.isLoaded = true;
+            state.isRejected = false;
+            state.cart = action.payload;
+        })
+        .addCase(deleteFromCart.rejected, (state, action) => {
+            state.isPending = false;
+            state.isLoaded = false;
+            state.isRejected = true;
+            state.errorMessage = action.error.message;
+        })
+
+        .addCase(checkout.pending, (state, action) => {
+            state.isPending = true;
+            state.isLoaded = false;
+            state.isRejected = false;
+        })
+        .addCase(checkout.fulfilled, (state, action) => {
+            state.isPending = false;
+            state.isLoaded = true;
+            state.isRejected = false;
+            state.products = action.payload;
+            state.cart = [];
+            alert('Checkout Success')
+        })
+        .addCase(checkout.rejected, (state, action) => {
             state.isPending = false;
             state.isLoaded = false;
             state.isRejected = true;
@@ -162,4 +357,5 @@ const handleCart = createSlice({
 //     }
 // }
 
+export const {increment, decrement} = handleCart.actions;
 export default handleCart.reducer;

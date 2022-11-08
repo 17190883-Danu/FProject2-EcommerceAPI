@@ -5,6 +5,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 // import { useParams } from 'react-router';
 import { fetchProducts, addToCart } from "../redux/reducer/handleCart";
+import { FiShoppingCart } from "react-icons/fi";
 
 const Products = () => {
     const [data, setData] = useState([]);
@@ -105,16 +106,18 @@ const Products = () => {
     //     );
     // };
 
-    const checkLoginOnCart = (id, stock) => {
+    const checkLoginOnCart = (id, stock, name) => {
         if(localStorage.getItem("login") === null) {
             navigate('/login')
         } else {
             if(stock > 0) {
                 dispatch(addToCart(id));
-                alert(`Item ${id} have successfully added to cart`);
+                alert(`Item ${name} have successfully added to cart`);
             }
         }
     }
+
+    console.log('allproducts', allProducts)
 
     return (
         <div>
@@ -127,29 +130,27 @@ const Products = () => {
                 </div>
                     <div className="row justify-content-center">
                         {
-                            allProducts.map((item) => (
-                            <>
+                            allProducts.map((item, index) => (
                                 <div className="col-md-3 mb-4">
                                     <div className="card h-100 text-center p-4" key={item.id}>
                                         <img src={item.image} className="card-img-top" alt=
                                         {item.title} height="250px" />
-                                        <div className="card-body">
-                                            <h5 className="card-title mb-0">{item.title.substring(0,
-                                                12)}</h5>
+                                        <div className="card-body d-flex justify-content-between flex-column">
+                                            <h5 className="card-title mb-0">{item.title}</h5>
                                             <p className="card-text lead fw-bold">
                                                 ${item.price}
                                             </p>
-                                            <Link to={`/product/${item.id}`} className="btn btn-primary">
-                                                Detail
-                                            </Link>
-                                            <button className='btn btn-primary' onClick={() => checkLoginOnCart(item.id, item.stock)}>
-                                                Add to Cart
-                                            </button>
+                                            <div className="d-flex justify-content-between gap-1">
+                                                <Link to={`/product/${item.id}`} className="btn btn-primary w-100">
+                                                    Detail
+                                                </Link>
+                                                <button className='btn btn-outline-primary w-50' onClick={() => checkLoginOnCart(item.id, item.stock, item.title)}>
+                                                    <FiShoppingCart />
+                                                </button>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
-                            </>
-                                
                             ))
                         }
                     </div>

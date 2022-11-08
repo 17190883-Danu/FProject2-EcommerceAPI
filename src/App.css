@@ -7,6 +7,16 @@ h1,h2,h3,h4,h5,h6,p,span {
   color: rgb(56, 55, 56) !important;
 }
 
+.input-number::-webkit-outer-spin-button, .input-number::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.input-number {
+  -moz-appearance: textfield;
+  text-align: center;
+}
+
 /* .App {
   text-align: center;
 }

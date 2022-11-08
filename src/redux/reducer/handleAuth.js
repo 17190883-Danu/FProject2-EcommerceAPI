@@ -64,8 +64,9 @@ const handleAuth = createSlice({
                 state.isLoginPending = false;
                 state.isLoginSuccess = true;
                 const loginInfo = [{
+                    'id_user': user.id,
                     'firstname': user.name.firstname,
-                    'lasttname': user.name.lastname,
+                    'lastname': user.name.lastname,
                     'token': token
                 }]
                 localStorage.setItem('login', JSON.stringify(loginInfo))
