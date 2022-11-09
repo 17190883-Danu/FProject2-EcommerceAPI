@@ -14,6 +14,14 @@ const initialState = {
 
 const PRODUCTS_URL = 'https://fakestoreapi.com/products';
 
+function getCurrentDateTime() {
+    const today = new Date();
+    const date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    const time = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+    const dateTime = date+' '+time;
+    return dateTime
+}
+
 function getProductAPI() {
     const tempData = JSON.parse(localStorage.getItem("products"))
     // console.log('tempData', tempData) 
@@ -168,8 +176,10 @@ export const checkout = createAsyncThunk('cart/checkout', async () => {
             }
         })
         const emptyCart = response.filter((x) => x.id_user !== userId)
+        const buyRecord = [...filteredCart, {status: 'paid', time: getCurrentDateTime()}]
         localStorage.setItem("cart", JSON.stringify(emptyCart))
         localStorage.setItem("products", JSON.stringify(data))
+        localStorage.setItem("buyRecord", JSON.stringify(buyRecord))
         // console.log('filteredCart ', filteredCart)
         return data
     } catch(err) {
