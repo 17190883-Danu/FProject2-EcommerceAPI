@@ -6,6 +6,8 @@ import './App.css';
 import {Routes, Route, useLocation} from "react-router-dom";
 import ProductDetail from './components/Prodet';
 import LoginForm from './components/LoginForm';
+import UpdateStok from './components/admin/UpdateStok';
+import Rekap from './components/admin/Rekap';
 
 function App() {
   const path = useLocation();
@@ -18,6 +20,8 @@ function App() {
                   <Route element={<Products/>} exact path="/" />
                   <Route element={<Cart />} path="/cart" />
                   <Route element={<ProductDetail/>} path="/product/:id" />
+                  <Route element={<Rekap />} path="/rekap" />
+                  <Route element={<UpdateStok />} path="/update" />
           </Routes>  
     </div>
   );

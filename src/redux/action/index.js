@@ -22,9 +22,18 @@ export const Login = (Login) => {
     }
 }
 
-export const TokenUser = (user) =>{
-    return{
-      type:"ADDTOKENUSER",
-      payload:user
-    }
-  }
+// updateStock
+export const updateStock = (products) => {
+    return {
+      type: "UPDATESTOCK",
+      payload: products,
+    };
+  };
+  
+  // update Stock From Admin
+  export const updateStockAdmin = (products) => {
+    return {
+      type: "UPDATESTOCKFROMADMIN",
+      payload: products,
+    };
+  };

@@ -69,4 +69,4 @@ function Rekap() {
   );
 }
 
-export default Rekap;
+export default Rekap; 

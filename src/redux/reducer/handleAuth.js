@@ -70,12 +70,24 @@ const handleAuth = createSlice({
                     'token': token
                 }]
                 localStorage.setItem('login', JSON.stringify(loginInfo))
+            } else if (email === 'admin@bukapedia.com' && password === 'admin123') {
+                const token = uuidv4()
+                state.isLoginPending = false;
+                state.isLoginSuccess = true;
+                const loginInfo = [{
+                    email: 'admin@bukapedia.com',
+                    password: 'admin123',
+                    'token': token
+                }]
+                localStorage.setItem('login', JSON.stringify(loginInfo))
+                return 
             } else {
                 alert('no')
                 state.isLoginPending = false;
                 state.isLoginSuccess = false;
                 state.errorMessage = 'Invalid email or password'
             }
+            
         })
         .addCase(authLoginAPI.rejected, (state, action) => {
             state.isLoginPending = false
