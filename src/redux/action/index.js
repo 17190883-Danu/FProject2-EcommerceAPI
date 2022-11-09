@@ -21,3 +21,10 @@ export const Login = (Login) => {
         payload : Login
     }
 }
+
+export const TokenUser = (user) =>{
+    return{
+      type:"ADDTOKENUSER",
+      payload:user
+    }
+  }

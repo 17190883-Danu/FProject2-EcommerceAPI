@@ -6,35 +6,92 @@ import { authLoginAPI } from "../redux/reducer/handleAuth";
 import landingImage from '../assets/Login_Image.svg'
 import backgroundImage from '../assets/Background_Login.svg'
 import { FiArrowLeft } from "react-icons/fi";
+import { TokenUser } from "../redux/action"
 
-function LoginForm() {
-  const history = useNavigate();
-  const [error, setError] = useState("");
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const dispatch = useDispatch();
-  const loginState = useSelector((state) => state.auth)
-  const navigate = useNavigate()
+// function LoginForm() {
+//   const history = useNavigate();
+//   const [error, setError] = useState("");
+//   const [email, setEmail] = useState("");
+//   const [password, setPassword] = useState("");
+//   const dispatch = useDispatch();
+//   const loginState = useSelector((state) => state.auth)
+//   const navigate = useNavigate()
 
-  const submitHandler = (e) => {
-    e.preventDefault();
-    const login = {email, password}
-    dispatch(authLoginAPI({email, password}))
-    .unwrap()
-    .then(() => {
-      // handleRedirectToHome()
-      navigate('/')
-      window.location.reload()
-    })
-  };
+  // const submitHandler = (e) => {
+  //   e.preventDefault();
+  //   const login = {email, password}
+  //   dispatch(authLoginAPI({email, password}))
+  //   .unwrap()
+  //   .then(() => {
+  //     // handleRedirectToHome()
+  //     navigate('/')
+  //     window.location.reload()
+  //   })
+  // };
 
-  const emailChange = (event) => {
-    setEmail(event.target.value);
-  }
+  // const emailChange = (event) => {
+  //   setEmail(event.target.value);
+  // }
 
-  const passwordChange = (event) => {
-    setPassword(event.target.value);
-  }
+  // const passwordChange = (event) => {
+  //   setPassword(event.target.value);
+  // }
+
+  function LoginForm() {
+    const history = useNavigate();
+    const [user, setUser] = useState({ username: "" });
+    const [error, setError] = useState("");
+    const [details, setDetails] = useState({ username: "", password: "" });
+    const dispatch = useDispatch();
+    const loginState = useSelector((state) => state.auth)
+  
+    const ADMIN_TOKEN = "452146856344562";
+  
+    const adminUser = {
+      username: "admin@bukapedia.com",
+      password: "admin123",
+    };
+  
+    const users = {
+      username: "john@gmail.com",
+      password: "m38rmF$",
+    };
+  
+    const Login = async (details) => {
+      if (
+        details.username == adminUser.username &&
+        details.password == adminUser.password
+      ) {
+        console.log("logged in");
+        localStorage.setItem("token", ADMIN_TOKEN);
+        setUser({
+          username: details.username,
+        });
+        history.push(`/update`);
+      } else if (
+        details.username == users.username &&
+        details.password == users.password
+      ) {
+        const res = await axios.post("https://fakestoreapi.com/auth/login", {
+          username: users.username,
+          password: users.password,
+        });
+  
+        const token = res.data.token;
+        dispatch(TokenUser(token));
+        localStorage.setItem("token", token);
+        history.push(`/`);
+      } else {
+        setError("username and password do not match !");
+      }
+    };
+  
+    const submitHandler = (e) => {
+      e.preventDefault();
+  
+      Login(details);
+    };
+
 
   return (
     <div className="vh-100 vw-100 d-flex bg-blue-pastel justify-content-center" style={{backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundRepeat: 'no-repeat'}}>
@@ -48,14 +105,19 @@ function LoginForm() {
           <span className="mb-5">Masuk dan mulailah roleplay menjadi orang kaya</span>
           <div className="mb-3 w-100">
             <label htmlFor="Email" className='form-label'>Username</label><br/>
-            <div className="input-group">
-              <input type="email" name="email" id="Email" className="form-control rounded-md py-2"
-              placeholder="Your Email"
-              onChange={emailChange}
-              value={email}
-              />
-              <span className="input-group-text">@</span>
-            </div>
+              <div className="input-group">
+                  <input type="email" name="email" id="Email" className="form-control rounded-md py-2"
+                  placeholder="Your Email"
+                  // onChange={emailChange}
+                  // value={email}
+                  onChange={(e) =>
+                    setDetails({ ...details, username: e.target.value })
+                  }
+                  value={details.username}
+
+                  />
+                  <span className="input-group-text">@</span>
+              </div>
           </div>
           <div className="mb-3 w-100">
             <label htmlFor="password" className='form-label'>Password</label><br/>
@@ -64,8 +126,13 @@ function LoginForm() {
               className="form-control rounded-md py-2"
               id="password"
               placeholder="Your Password"
-              onChange={passwordChange}
-              value={password}
+              // onChange={passwordChange}
+              // value={password}
+              onChange={(e) =>
+                setDetails({ ...details, password: e.target.value })
+              }
+              value={details.password}
+
             />
           </div>
 
