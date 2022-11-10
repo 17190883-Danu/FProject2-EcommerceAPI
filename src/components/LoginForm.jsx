@@ -16,27 +16,29 @@ function LoginForm() {
   const loginState = useSelector((state) => state.auth)
   const navigate = useNavigate()
 
+  useEffect(() => {
+    if (loginState.isLoginSuccess) {
+      navigate(loginState.loginRoute)
+    }
+  }, [loginState.isLoginSuccess])
+
   const submitHandler = (e) => {
     e.preventDefault();
     const login = {email, password}
-    if ('user') {
-      dispatch(authLoginAPI({email, password}))
+    dispatch(authLoginAPI({email, password}))
     .unwrap()
-    .then(() => {
-      // handleRedirectToHome()
-      navigate('/')
-      window.location.reload()
-    })
-    } else if ('admin') {
-      dispatch(authLoginAPI({email, password}))
-    .unwrap()
-    .then(() => {
-      navigate('/update')
-      window.location.reload()
-    })
+    // .then(() => {
+    //   console.log('level ',loginState)
+    //   if(loginState === 'admin') {
+    //     navigate('/update')
+    //   } else {
+    //     navigate('/')
+    //   }
+    //     // window.location.reload()
+    //   })
+    // console.log('state ', loginState)
+    // navigate(loginState.loginRoute)
     }
-    
-  };
 
   const emailChange = (event) => {
     setEmail(event.target.value);
