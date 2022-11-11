@@ -64,7 +64,7 @@ function reduceStock(id) {
 function changeQty(itemId, qtyState) {
         const response = JSON.parse(localStorage.getItem("cart"))
         const data = response.map((x) => {
-            console.log(itemId) 
+            // console.log(itemId) 
             if(x.cart_id == itemId) {
                 const newQty = x.qty + (qtyState)
                 return {...x, qty: newQty}
@@ -148,7 +148,7 @@ export const deleteFromCart = createAsyncThunk('cart/deleteFromCart', async (id)
         restoreStock(returnItem[0][0], returnItem[0][1])
         const data = response.filter((x) => x.cart_id !== id)
         localStorage.setItem("cart", JSON.stringify(data))
-        console.log('data cart ', data)
+        // console.log('data cart ', data)
         return data
     } catch(err) {
         throw(err)

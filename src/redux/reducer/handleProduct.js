@@ -52,17 +52,22 @@ function changeStock(itemId, changedQty, method = null) {
     return data
 }
 
-function getPurchaseRecord() {
-    const tempData = JSON.parse(localStorage.getItem("buyRecord"))
+function getPurchaseRecordSummary() {
+    const tempData = (JSON.parse(localStorage.getItem("buyrecord")) !== null) ? JSON.parse(localStorage.getItem("buyrecord")) : []
     // console.log('tempData', tempData) 
-    if(tempData !== null) {
-        return JSON.parse(localStorage.getItem("buyRecord"))
-    }
-    const data = new Promise((resolve, reject) => {
-        setTimeout(() => {
-            resolve([])
-        }, 1000)
+    const groupBy = tempData.reduce((acc, obj) => {
+        acc[obj.id] = acc[obj.id] || 0;
+        acc[obj.id] += obj.qty;
+        return acc;
+    }, {});
+    console.log('groupBy', groupBy)
+    const data = Object.keys(groupBy).map((key) => {
+        const itemData = tempData.find((x) => x.id === parseInt(key))
+        return {...itemData, qty: groupBy[key]}
+        // return {id: key, qty: groupBy[key]}
     })
+    console.log('merge object ', data)
+   
     return data;
 }
 
@@ -77,7 +82,7 @@ export const fetchProducts = createAsyncThunk('products/fetchProducts', async ()
 
 export const fetchPurchaseRecord = createAsyncThunk('products/fetchPurchaseRecord', async () => {
     try {
-        const response = await getPurchaseRecord()
+        const response = await getPurchaseRecordSummary()
         return response
     } catch(err) {
         throw(err)

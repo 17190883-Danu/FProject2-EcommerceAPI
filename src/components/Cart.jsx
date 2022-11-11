@@ -17,10 +17,13 @@ import {
 import { useNavigate } from 'react-router-dom'
 
 const Cart = () => {
+  const [isDisabled, setIsDisabled] = useState(false)
+  const [hideError, setHideError] = useState({})
   const cartData = useSelector(state => state.cart.cart)
   const cartState = useSelector(state => state.cart)
   const totalPrice = Object.values(cartData).reduce((a, b) => a + (b.price * b.qty), 0)
   const totalItem = Object.values(cartData).reduce((a, b) => a + b.qty, 0)
+  const productStock = JSON.parse(localStorage.getItem('products'))
   const navigate = useNavigate()
 
   const dispatch = useDispatch(); 
@@ -39,26 +42,71 @@ const Cart = () => {
     doFetch()
   }, [])
 
+  useEffect(() => {
+    cartData.map((cart) => {
+      if(cart.qty > productStock[cart.id].stock) {
+        setHideError((prev) => ({
+          ...prev,
+          [cart.id]: false,
+        }));
+      } else {
+        setHideError((prev) => ({
+          ...prev,
+          [cart.id]: true,
+        }));
+      }
+    });
+  }, [cartState.isCheckout])
+
+  // console.log('hideError', hideError)
+
   const handleRemove = (id, name) => {
     if(window.confirm(`Yakin ingin menghapus barang ${name} dari belanjaan?`) == true) {
       dispatch(deleteFromCart(id))
     }
   }
 
-  const handleDecrement = (id, qty, name) => {
-    console.log('qty',qty)
+  const handleDecrement = (id, qty, name, itemId) => {
     if(qty >= 1) {
       dispatch(decrement({id}))
     } else if(qty < 1) {
       handleRemove(id, name)
     }
+    // console.log('qty-', qty)
+    if(productStock[itemId].stock >= qty-1) {
+      setIsDisabled(false)
+      setHideError((prev) => ({
+        ...prev,
+        [itemId]: true,
+      }));
+    } else {
+      setIsDisabled(true)
+      setHideError((prev) => ({
+        ...prev,
+        [itemId]: false,
+      }));
+    }
+   
   }
   
-  const handleIncrement = (id, qty) => {
+  const handleIncrement = (id, qty, itemId) => {
+    // console.log('productStock', productStock[itemId])
     if(qty > 0) {
       dispatch(increment({id}))
+    }
+    // console.log('qty+', qty)
+    if(productStock[itemId].stock >= qty+1) {
+      setIsDisabled(false)
+      setHideError((prev) => ({
+        ...prev,
+        [itemId]: true,
+      }));
     } else {
-      
+      setIsDisabled(true)
+      setHideError((prev) => ({
+        ...prev,
+        [itemId]: false,
+      }));
     }
   }
 
@@ -81,6 +129,7 @@ const Cart = () => {
                       <div className="info-product">
                         <h5>{item.title}</h5>
                         <p>${item.price}</p>
+                        <p className={hideError[item.id] === true ? 'd-none' : 'text-danger'} >Jumlah barang melebihi stok</p>
                       </div>
                       <div className="d-flex flex-row align-self-end">
                         <button
@@ -92,7 +141,7 @@ const Cart = () => {
                         </button>
                         <button
                         className='btn btn-link text-decoration-none text-reset'
-                        onClick={() => handleDecrement(item.cart_id, item.qty, item.title)}
+                        onClick={() => handleDecrement(item.cart_id, item.qty, item.title, item.id)}
                         // disabled={cartState.isPending && true}
                         >
                           <FiMinusCircle />
@@ -100,7 +149,7 @@ const Cart = () => {
                         <input type="number" className='border-bottom input-number' id='qtyInput' value={item.qty} style={{border: 'none', outline: 'none'}} readOnly />
                         <button
                         className='btn btn-link text-decoration-none text-reset'
-                        onClick={() => handleIncrement(item.cart_id, item.qty)}
+                        onClick={() => handleIncrement(item.cart_id, item.qty, item.id)}
                         // disabled={cartState.isPending && true}
                         >
                           <FiPlusCircle />
@@ -135,7 +184,7 @@ const Cart = () => {
                     <p className='mb-1 text-end fw-bold'>USD {Math.round((totalPrice + Number.EPSILON) * 100) / 100}</p>
                 </div>
               </div>
-              <button className="btn btn-primary mt-2" onClick={() => dispatch(checkout())}>Checkout</button>
+              <button className="btn btn-primary mt-2" onClick={() => dispatch(checkout())} disabled={isDisabled}>Checkout</button>
             </div>
           </div>
         ) : (

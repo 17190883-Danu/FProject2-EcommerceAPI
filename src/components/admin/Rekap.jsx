@@ -72,18 +72,13 @@ function Rekap() {
                     </tr>
                   ))}
                 </tbody>
-                <tfoot>
-                  <tr>
-                    <th>Total Pendapatan: </th>
-                    <th className="col-span-2">$ {calculeTotal.toFixed(2)}</th>
-                  </tr>
-                </tfoot>
               </table>
             </div>
             <div className="rounded-3 border shadow-sm w-25">
               <div className="p-3">
-                <h6 className="text-start">Total Pendapatan</h6>
-                <h6 className="text-start">$ {calculeTotal.toFixed(2)}</h6>
+                <h3 className="mb-2">Total penjualan</h3>
+                <h6 className="text-start mb-1">Total Pendapatan</h6>
+                <h6 className="text-start mb-2">$ {calculeTotal.toFixed(2)}</h6>
               </div>
             </div>
           </div>
