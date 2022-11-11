@@ -63,22 +63,22 @@ const handleAuth = createSlice({
                 const token = uuidv4()
                 state.isLoginPending = false;
                 state.isLoginSuccess = true;
-                const loginInfo = [{
+                const loginInfo = {
                     'id_user': user.id,
                     'firstname': user.name.firstname,
                     'lastname': user.name.lastname,
-                    'token': token
-                }]
+                    isadmin: false
+                }
                 state.loginRoute = '/'
                 localStorage.setItem('login', JSON.stringify(loginInfo))
             } else if (email === 'admin@bukapedia.com' && password === 'admin123') {
                 const token = uuidv4()
                 state.isLoginPending = false;
                 state.isLoginSuccess = true;
-                const loginInfo = [{
+                const loginInfo = {
                     email: 'admin@bukapedia.com',
-                    'token': token
-                }]
+                    isadmin: true
+                }
                 localStorage.setItem('login', JSON.stringify(loginInfo))
                 state.loginRoute = '/update'
             } else {

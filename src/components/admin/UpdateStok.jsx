@@ -1,70 +1,143 @@
-import React, { useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import { updateStockAdmin } from "../../redux/action";
+import {
+  fetchProducts,
+  increment,
+  decrement,
+  onChangeStock
+} from "../../redux/reducer/handleProduct";
+import {
+  FiPlusCircle,
+  FiMinusCircle,
+} from "react-icons/fi";
+import { useNavigate } from "react-router-dom";
 
 function UpdateStok() {
-  const updateStock = useSelector((state) => state.handleProduct.product);
-  const [inputQty, setInputQty] = useState("");
+  const productLists = useSelector((state) => state.product.products);
+  const productState = useSelector((state) => state.product);
+  const [inputQty, setInputQty] = useState({});
+  const stockRef = useRef();
   const dispatch = useDispatch();
-  // console.log(updateStock)
+  const navigate = useNavigate();
 
-  console.log(inputQty);
+  useEffect(() => {
+    dispatch(fetchProducts());
+  }, []);
 
-  const handleChange = (e) => {
-    setInputQty(e.target.value);
-  };
+  useEffect(() => {
+    const login = (JSON.parse(localStorage.getItem('login')))
+    if(login === null || login.isadmin == false) {
+      navigate('/login')
+    }
+  }, [])
+
+  useEffect(() => {
+    productLists.map((product) => {
+      setInputQty((prev) => ({
+        ...prev,
+        [product.id]: product.stock,
+      }));
+    });
+    console.log('asd')
+  }, [productLists]);
+
+  // console.log("productLists", JSON.parse(inputQty[1]));
 
   const handleButtonUpdate = (product) => {
     let newProduct = { ...product, qty: parseInt(inputQty) };
     console.log(newProduct);
-    dispatch(updateStockAdmin(newProduct));
-    setInputQty("");
+    // dispatch(updateStockAdmin(newProduct));
+  };
+
+  const handleIncrement = (id, qty, index) => {
+    if(qty >= 0) {
+      dispatch(increment({id}))
+      setInputQty((prev) => ({
+        ...prev,
+        [id]: qty + 1,
+      }));
+    }
+  }
+
+  const handleDecrement = (id, qty, index) => {
+    if(qty > 0) {
+      dispatch(decrement({id}))
+      setInputQty((prev) => ({
+        ...prev,
+        [id]: qty - 1,
+      }));
+    }
+  }
+
+  const handleChange = (id, stock) => {
+    if(stock < 0 || stock === null || stock === '') {
+      stock = 0
+    }
+    setInputQty((prev) => ({
+      ...prev,
+      [id]: stock,
+    }));
+    stock = parseInt(stock)
+    dispatch(onChangeStock({id, stock}))
   };
 
   return (
-    <div className="bg-white">
+    <div className="container bg-white mt-4">
       <div className="max-w-2xl mx-auto py-16 px-4 sm:py-24 sm:px-6 lg:max-w-7xl lg:px-8">
         <h2 className="text-2xl font-extrabold tracking-tight text-black-soft">
           Products
         </h2>
-        <div className="table-responsive">
-          <table class="border-collapse border border-black-soft-800 ...">
+        <div className="">
+          <table class="table table-responsive border-collapse border border-black-soft-800">
             <thead class="table-dark">
-              <tr class="border border-black-soft-600 p-2 bg-black-soft text-sm text-white h-5 w-5 ...">
-                <th>Product</th>
-                <th>Stok</th>
-                <th>Action</th>
+              <tr class="border border-black-soft-600 p-2 bg-black-soft text-sm text-white h-5 w-5">
+                <th>#</th>
+                <th colSpan={2}>Product</th>
+                <th className="text-center">Stok</th>
               </tr>
             </thead>
             <tbody>
-              {updateStock.map((products) => (
+              {productLists.map((products, index) => (
                 <tr
                   key={products.id}
-                  class="border border-black-soft-600 p-2 h-5 w-5 ...">
+                  class="">
+                  <td>{index + 1}</td>
                   <td>
                     {products.title}
-                    <td />
+                  </td>
+                  <td>
                     {products.category}
                   </td>
-                  <td class="border border-black-soft-600 p-2 h-5 w-5 ...">
-                    <input
+                  <td align="right">
+                    <button
+                    className='btn btn-link text-decoration-none text-reset'
+                    onClick={() => handleDecrement(products.id, inputQty[index+1], index)}
+                    // disabled={cartState.isPending && true}
+                    >
+                      <FiMinusCircle />
+                    </button>
+                    <input 
+                    type="number" 
+                    className='border-bottom input-number w-25' 
+                    id={`qtyInput${index}`} 
+                    value={ inputQty[index+1]} 
+                    style={{border: 'none', outline: 'none'}} 
+                    onChange={(e) => handleChange(products.id, e.target.value)} 
+                    min="0" />
+                    <button
+                    className='btn btn-link text-decoration-none text-reset'
+                    onClick={() => handleIncrement(products.id, inputQty[index+1], index)}
+                    // disabled={cartState.isPending && true}
+                    >
+                      <FiPlusCircle />
+                    </button>
+                    {/* <input
                       key={products.id}
                       type="text"
                       className={`form-control border border-black-soft-600 p-2 h-7 w-25 ...`}
                       placeholder={products.qty}
                       onChange={handleChange}
-                    />
-                  </td>
-                  <td class="border border-black-soft-600 p-2 ...">
-                    <button
-                      key={products.id}
-                      className={`bg-blue-pastel group w-full py-2 px-4 text-sm text-white rounded-md border 
-                    border-blue-pastel leading-5 font-medium hover:bg-blue-pastel focus:outline-none focus:border-blue-pastel 
-                    focus:shadow-outline-blue-pastel active:outline-none transition duration-150 ease-in-out`}
-                      type="button"
-                      onClick={() => handleButtonUpdate(products)}>
-                      Update
-                    </button>
+                    /> */}
                   </td>
                 </tr>
               ))}

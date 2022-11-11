@@ -5,14 +5,16 @@ import {
     FiLogIn,
     FiLogOut,
     FiShoppingCart,
-    FiHome
+    FiHome,
+    FiShoppingBag,
+    FiDollarSign
 } from "react-icons/fi";
 import { logout } from "../redux/reducer/handleAuth";
 
 
 const Navbar = () => {
     const dispatch = useDispatch();
-    const loginInfo = JSON.parse(localStorage.getItem("login"));
+    const loginInfo = (JSON.parse(localStorage.getItem("login")) || {});
     const navigate = useNavigate();
     console.log('loginInfo ', loginInfo)
 
@@ -33,17 +35,36 @@ const Navbar = () => {
                     </button>
                     <div className="collapse navbar-collapse" id="navbarNavAltMarkup">
                         <div className="navbar-nav container d-flex justify-content-center align-items-center gap-5">
-                            <NavLink className="text-reset text-decoration-none d-flex align-items-center" to="/">
-                                <FiHome />&nbsp;Home
-                            </NavLink> 
-                            <NavLink className="text-reset text-decoration-none d-flex align-items-center" to={loginInfo === null ? "/login" : "/cart"}>
-                                <FiShoppingCart/>&nbsp;Cart
-                            </NavLink> 
+                        {loginInfo.isadmin == true ? (
+                            <>
+                                <NavLink className="text-reset text-decoration-none d-flex align-items-center" to="/update">
+                                    <FiShoppingBag />&nbsp;Update Product
+                                </NavLink> 
+                                <NavLink className="text-reset text-decoration-none d-flex align-items-center" to="/rekap">
+                                    <FiDollarSign />&nbsp;Rekap
+                                </NavLink> 
+                            </>
+                        ) : (
+                            <>
+                                <NavLink className="text-reset text-decoration-none d-flex align-items-center" to="/">
+                                    <FiHome />&nbsp;Home
+                                </NavLink> 
+                                <NavLink className="text-reset text-decoration-none d-flex align-items-center" to={loginInfo === null ? "/login" : "/cart"}>
+                                    <FiShoppingCart/>&nbsp;Cart
+                                </NavLink> 
+                            </>
+                        )}
+                            
                         </div>
                     </div>
                     { loginInfo != null ? 
                     (
-                        <button component={NavLink} className="btn btn-outline-dark" tabindex="-1" role="button" aria-disabled="true" onClick={handleLogout}>
+                        <button component={NavLink} className="btn btn-outline-dark" tabindex="-1" role="button" aria-disabled="true" onClick={() => {
+                            handleLogout()
+                            if(loginInfo.isadmin === true) {
+                                navigate('/login')
+                            }
+                        }}>
                             <FiLogOut />
                             &nbsp;Logout
                         </button>

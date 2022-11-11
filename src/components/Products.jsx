@@ -21,6 +21,13 @@ const Products = () => {
         dispatch(fetchProducts());
     }, [])
 
+    useEffect(() => {
+        const login = JSON.parse(localStorage.getItem("login"));
+        if(login.isadmin) {
+            navigate("/login");
+        }
+    },[])
+
     // console.log('allProducts', allProducts)
 
     // useEffect(() => {
@@ -62,52 +69,9 @@ const Products = () => {
         );
     };
 
-    // const filterProduct = (cat) => {
-    //     const updatedList = data.filter((x)=>x.category === cat);
-    //     setFilter(updatedList);
-    // }
-
-    // const ShowProducts = () => {
-    //     return (
-    //         <>
-    //     <div className="buttons d-flex justify-content-center mb-5 pb-5">
-    //         <button className="btn btn-outline-dark me-2" onClick={() =>setFilter(data)}>All</button>
-    //         <button className="btn btn-outline-dark me-2" onClick={() =>filterProduct("men's clothing")}>Men's</button>
-    //         <button className="btn btn-outline-dark me-2" onClick={() =>filterProduct("women's clothing")}>Women's</button>
-    //         <button className="btn btn-outline-dark me-2" onClick={() =>filterProduct("jewelery")}>Jewelery</button>
-    //         <button className="btn btn-outline-dark me-2" onClick={() =>filterProduct("electronics")}>Electronic</button>
-    //     </div>
-    //     {filter.map((product) => {
-    //         return(
-    //             <>
-    //                 <div className="col-md-3 mb-4">
-    //                 <div className="card h-100 text-center p-4" key={product.id}>
-    //                 <img src={product.image} className="card-img-top" alt=
-    //                 {product.title} height="250px" />
-    //                 <div className="card-body">
-    //                     <h5 className="card-title mb-0">{product.title.substring(0,
-    //                         12)}</h5>
-    //                     <p className="card-text lead fw-bold">
-    //                         ${product.price}
-    //                     </p>
-    //                     <NavLink to={`/${product.id}`} className="btn btn-primary">
-    //                         Detail
-    //                     </NavLink>
-    //                     <button className='btn btn-primary'>
-    //                         Add to Cart
-    //                      </button>
-    //                 </div>
-    //                 </div>
-    //                 </div>
-    //             </>
-    //         )
-    //     })}
-    //         </>
-    //     );
-    // };
-
     const checkLoginOnCart = (id, stock, name) => {
-        if(localStorage.getItem("login") === null) {
+        const login = JSON.parse(localStorage.getItem("login"));
+        if(login === null || login.isadmin === true) {
             navigate('/login')
         } else {
             if(stock > 0) {

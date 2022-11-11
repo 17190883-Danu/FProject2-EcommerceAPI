@@ -73,10 +73,8 @@ function changeQty(itemId, qtyState) {
             }
         })
         const loginInfo = JSON.parse(localStorage.getItem("login"))
-        const userId = loginInfo[0].id_user
-        console.log('userId ', userId)
+        const userId = loginInfo.id_user
         const filteredData = data.filter((x) => x.id_user === userId)
-        console.log('filteredData ', filteredData)
         localStorage.setItem("cart", JSON.stringify(filteredData))
         return filteredData
 }
@@ -119,7 +117,7 @@ export const showCart = createAsyncThunk('cart/showCart', async () => {
     try {
         const response = await JSON.parse(localStorage.getItem("cart"))
         const loggedUser = JSON.parse(localStorage.getItem("login"))
-        const userId = loggedUser[0].id_user
+        const userId = loggedUser.id_user
         const filteredCart = response.filter((x) => x.id_user === userId)
         // console.log('response', response)
         return filteredCart
@@ -161,8 +159,9 @@ export const checkout = createAsyncThunk('cart/checkout', async () => {
     try {
         const response = await JSON.parse(localStorage.getItem("cart"))
         const products = await JSON.parse(localStorage.getItem("products"))
+        const purchaselogs = await (JSON.parse(localStorage.getItem("buyrecord")) || [])
         const loggedUser = JSON.parse(localStorage.getItem("login"))
-        const userId = loggedUser[0].id_user
+        const userId = loggedUser.id_user
         const filteredCart = response.filter((x) => x.id_user === userId)
         // const data = filteredCart.map((x) => {
         //     return {...x, status: 'paid'}
@@ -176,10 +175,15 @@ export const checkout = createAsyncThunk('cart/checkout', async () => {
             }
         })
         const emptyCart = response.filter((x) => x.id_user !== userId)
-        const buyRecord = [...filteredCart, {status: 'paid', time: getCurrentDateTime()}]
+        // console.log('filteredcart ',filteredCart)
+        const buyRecord = filteredCart.map((x) => {
+            return {...x, status: 'paid', date: getCurrentDateTime()}
+        })
+        const newRecord = [...purchaselogs, ...buyRecord]
         localStorage.setItem("cart", JSON.stringify(emptyCart))
         localStorage.setItem("products", JSON.stringify(data))
-        localStorage.setItem("buyRecord", JSON.stringify(buyRecord))
+        // console.log('record ', newRecord)
+        localStorage.setItem("buyrecord", JSON.stringify(newRecord))
         // console.log('filteredCart ', filteredCart)
         return data
     } catch(err) {
@@ -192,7 +196,6 @@ const handleCart = createSlice({
     initialState,
     reducers: {
         increment: (state, action) => {
-            console.log('itemId ', action.payload)
             const {id} = action.payload
             state.cart = changeQty(id, 1)
         },
@@ -267,7 +270,7 @@ const handleCart = createSlice({
             state.isRejected = false;
             const loggedUser = JSON.parse(localStorage.getItem("login"))
             const cart = (JSON.parse(localStorage.getItem("cart")) ? JSON.parse(localStorage.getItem("cart")) : [])
-            const userId = loggedUser[0].id_user
+            const userId = loggedUser.id_user
             const data = action.payload[0]
             const index = cart.findIndex((x) => x.id === data.id && x.id_user === userId)
             const cartId = uuidv4()

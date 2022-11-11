@@ -1,5 +1,6 @@
 import { times } from 'lodash'
 import React, {useEffect, useState} from 'react'
+import emptyCartIllustration from '../assets/Empty_Cart.svg'
 import {useSelector, useDispatch} from 'react-redux'
 import {
   showCart,
@@ -13,17 +14,26 @@ import {
   FiPlusCircle,
   FiMinusCircle,
 } from 'react-icons/fi'
+import { useNavigate } from 'react-router-dom'
 
 const Cart = () => {
   const cartData = useSelector(state => state.cart.cart)
   const cartState = useSelector(state => state.cart)
   const totalPrice = Object.values(cartData).reduce((a, b) => a + (b.price * b.qty), 0)
   const totalItem = Object.values(cartData).reduce((a, b) => a + b.qty, 0)
+  const navigate = useNavigate()
 
   const dispatch = useDispatch(); 
   const doFetch = () => {
     dispatch(showCart());
   }
+
+  useEffect(() => {
+    const login = (JSON.parse(localStorage.getItem('login')))
+    if(login === null || login.isadmin == true) {
+      navigate('/login')
+    }
+  }, [])
 
   useEffect(() => {
     doFetch()
@@ -128,7 +138,13 @@ const Cart = () => {
               <button className="btn btn-primary mt-2" onClick={() => dispatch(checkout())}>Checkout</button>
             </div>
           </div>
-        ) : ''}
+        ) : (
+          <div className="d-flex flex-column justify-content-center align-items-center">
+            <object className='mb-4' data={ emptyCartIllustration } type="image/svg+xml" style={{width: '100%', maxWidth: '500px'}}></object>
+            <h1>Cart is empty</h1>
+            <p>Let's add some products to your cart</p>
+          </div>
+        )}
         
       </div>
     </>
