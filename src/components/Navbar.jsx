@@ -57,7 +57,7 @@ const Navbar = () => {
                             
                         </div>
                     </div>
-                    { loginInfo != null ? 
+                    { loginInfo.username !== undefined ? 
                     (
                         <button component={NavLink} className="btn btn-outline-dark" tabindex="-1" role="button" aria-disabled="true" onClick={() => {
                             handleLogout()

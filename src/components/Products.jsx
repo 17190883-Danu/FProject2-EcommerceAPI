@@ -22,30 +22,11 @@ const Products = () => {
     }, [])
 
     useEffect(() => {
-        const login = JSON.parse(localStorage.getItem("login"));
+        const login = (JSON.parse(localStorage.getItem("login")) || {});
         if(login.isadmin) {
-            navigate("/login");
+            navigate("/update");
         }
     },[])
-
-    // console.log('allProducts', allProducts)
-
-    // useEffect(() => {
-    // const getProducts = async () => {
-    //     setLoading(true);
-    //     const response = await fetch("https://fakestoreapi.com/products");
-    //     if(componentMounted){
-    //         setData(await response.clone().json());
-    //         setFilter(await response.json());
-    //         setLoading(false);
-    //         console.log(filter);
-    //     }
-    //     return() => {
-    //         componentMounted = false;
-    //     }
-    // }
-    //  getProducts();   
-    // }, []);
 
     const Loading = () => {
         return(
