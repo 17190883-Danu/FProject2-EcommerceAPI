@@ -62,7 +62,7 @@ const Products = () => {
         }
     }
 
-    console.log('allproducts', allProducts)
+    // console.log('allproducts', allProducts)
 
     return (
         <div>

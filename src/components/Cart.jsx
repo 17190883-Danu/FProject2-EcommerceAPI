@@ -56,7 +56,7 @@ const Cart = () => {
         }));
       }
     });
-  }, [cartState.isCheckout])
+  }, [cartState])
 
   // console.log('hideError', hideError)
 
@@ -117,7 +117,7 @@ const Cart = () => {
         {cartData.length > 0 ? (
           <div className="d-flex flex-row justify-content-between align-items-start gap-5">
             <div className="d-flex flex-column gap-4 justify-content-between w-75">
-              {cartState.loading ? <h1>Loading...</h1> : (
+              {cartState.isPending ? <h1>Loading...</h1> : (
                 cartData.map((item, index) => (
                   <div key={index} className="d-flex flex-row gap-3 rounded border shadow-sm p-3">
                     <img src={item.image} alt="product" style={{
@@ -129,6 +129,7 @@ const Cart = () => {
                       <div className="info-product">
                         <h5>{item.title}</h5>
                         <p>${item.price}</p>
+                        { console.log(`hideError${item.i}`, hideError[item.id]) }
                         <p className={hideError[item.id] === true ? 'd-none' : 'text-danger'} >Jumlah barang melebihi stok</p>
                       </div>
                       <div className="d-flex flex-row align-self-end">

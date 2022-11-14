@@ -1,4 +1,4 @@
-import React from "react";
+import React, {useState,useEffect} from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { NavLink, useNavigate } from "react-router-dom";
 import {
@@ -14,15 +14,24 @@ import { logout } from "../redux/reducer/handleAuth";
 
 const Navbar = () => {
     const dispatch = useDispatch();
+    const [loginState, setLoginState] = useState(false);
     const loginInfo = (JSON.parse(localStorage.getItem("login")) || {});
     const navigate = useNavigate();
     console.log('loginInfo ', loginInfo)
+
+    useEffect(() => {
+        if(loginInfo !== null || loginInfo !== undefined) {
+            setLoginState(true)
+        } 
+    })
 
     const handleLogout = () => {
         dispatch(logout())
         .unwrap()
         .then(() => {
-            window.location.reload()
+            // window.location.reload()
+            setLoginState(false)
+            alert('Logout Success')
         })
     }
     // const state = useSelector((state) => state.handleCart)
@@ -57,7 +66,7 @@ const Navbar = () => {
                             
                         </div>
                     </div>
-                    { loginInfo.username !== undefined ? 
+                    { loginInfo.firstname !== undefined || loginInfo.email !== undefined ? 
                     (
                         <button component={NavLink} className="btn btn-outline-dark" tabindex="-1" role="button" aria-disabled="true" onClick={() => {
                             handleLogout()

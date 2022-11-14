@@ -60,7 +60,7 @@ function getPurchaseRecordSummary() {
         acc[obj.id] += obj.qty;
         return acc;
     }, {});
-    console.log('groupBy', groupBy)
+    // console.log('groupBy', groupBy)
     const data = Object.keys(groupBy).map((key) => {
         const itemData = tempData.find((x) => x.id === parseInt(key))
         return {...itemData, qty: groupBy[key]}
